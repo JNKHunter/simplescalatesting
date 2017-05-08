@@ -36,12 +36,19 @@ object SimpleScalaSpark {
         tags = if(arr.length >= 6) Some(arr(5).intern()) else None
       )
   })
+  
+  def groupedPostings(postings: RDD[Posting]): RDD[(Int, Iterable[(Posting, Posting)])] = {
+    val questions = postings.filter(p => p.postingType == 1).map(q => (q.id, q))
+    val answers = postings.filter(p => p.postingType == 2).map(a => (a.parentId.get, a))
+    questions.join(answers).groupByKey()
+  }
 
   def main(args: Array[String]): Unit = {
     val dataRdd = sc.textFile(filePath)
     val postings = rawPostings(dataRdd)
-    postings.foreach(posting => println(posting.id))
+    val grouped = groupedPostings(postings)
 
+    grouped.foreach(group => println(group))
   }
 
 }
