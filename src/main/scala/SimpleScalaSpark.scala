@@ -15,14 +15,14 @@ case class Posting(postingType: Int,
 
 object SimpleScalaSpark {
 
-  val conf: SparkConf = new SparkConf().setMaster("local[2]").setAppName("SimpleScalaTesting")
+/*  val conf: SparkConf = new SparkConf().setMaster("local[2]").setAppName("SimpleScalaTesting")
   val sc: SparkContext = new SparkContext(conf)
 
   def filePath = {
     val resource = this.getClass.getClassLoader.getResource("data.dat")
     if (resource == null) sys.error("Please download the dataset as explained in the assignment instructions")
     new File(resource.toURI).getPath
-  }
+  }*/
 
   def rawPostings(lines: RDD[String]) : RDD[Posting] =
     lines.map(line => {
@@ -72,7 +72,7 @@ object SimpleScalaSpark {
       (question, highest)
     })
   }
-
+/* TODO: Once unit testing is set up, remove this
   def main(args: Array[String]): Unit = {
     val dataRdd = sc.textFile(filePath)
     val postings = rawPostings(dataRdd)
@@ -80,6 +80,6 @@ object SimpleScalaSpark {
     val scored = scoredPostings(grouped)
 
     scored.foreach(score => println(score))
-  }
+  }*/
 
 }
