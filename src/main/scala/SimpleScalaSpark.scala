@@ -43,12 +43,43 @@ object SimpleScalaSpark {
     questions.join(answers).groupByKey()
   }
 
+  def scoredPostings(grouped: RDD[(Int, Iterable[(Posting, Posting)])]): RDD[(Posting, Int)] = {
+
+    def answerHighScore(as: Array[Posting]): Int = {
+      var highScore = 0
+      var i = 0
+      while (i < as.length) {
+        val score = as(i).score
+        if (score > highScore)
+          highScore = score
+        i += 1
+      }
+      highScore
+    }
+
+    grouped.map(group => {
+
+      val answers = group._2.map(_._2).toArray
+      val questions = group._2.map(_._1).toArray
+      val highest = answerHighScore(answers)
+      var i = 0
+      var question:Posting = null
+
+      while (i < questions.length) {
+        question = questions(i)
+        i += 1
+      }
+      (question, highest)
+    })
+  }
+
   def main(args: Array[String]): Unit = {
     val dataRdd = sc.textFile(filePath)
     val postings = rawPostings(dataRdd)
     val grouped = groupedPostings(postings)
+    val scored = scoredPostings(grouped)
 
-    grouped.foreach(group => println(group))
+    scored.foreach(score => println(score))
   }
 
 }
